@@ -2,8 +2,9 @@ import React from "react";
 import Logo from "../assets/logo.svg";
 import { BsChatRightDots, BsChatRightText } from "react-icons/bs";
 import { RiGroupLine } from "react-icons/ri";
-import { AiOutlineSetting } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import DefaultProfile from "../assets/profile.jpg";
+import { FaRegUserCircle } from "react-icons/fa";
 
 const Header = () => {
   return (
@@ -21,8 +22,15 @@ const Header = () => {
           </Link>
         </div>
       </div>
-      <div className="flex justify-center items-center">
-        <AiOutlineSetting className="h-16 w-16 rounded-lg text-gray-800 cursor-pointer p-5" />
+      <div className="flex flex-col justify-center items-center">
+        {/* <FaRegUserCircle className="h-16 w-16 rounded-lg text-gray-800 cursor-pointer p-5" /> */}
+        <div>
+          <img
+            src={DefaultProfile}
+            className="h-10 w-10 rounded-full cursor-pointer"
+            alt="DefaultProfile"
+          />
+        </div>
       </div>
     </header>
   );

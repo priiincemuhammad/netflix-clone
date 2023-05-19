@@ -1,6 +1,4 @@
 import React from "react";
-import ProfileMale from "../assets/avatarM.jpg";
-import ProfileFemale from "../assets/avatarF.jpg";
 
 const Users = () => {
   const ProfileMale =
@@ -9,6 +7,7 @@ const Users = () => {
     "https://themesbrand.com/chatvia/layouts/assets/images/users/avatar-4.jpg";
 
   const textMessage = "Hey, how are you doing today?";
+  const textMessageTwo = "Ok, then call me when you're free.";
 
   return (
     <div className="bg-[#f5f7fb] min-w-[350px] col-span-3 p-5">
@@ -64,7 +63,7 @@ const Users = () => {
             <div>
               <h1 className="text-gray-900 font-bold">Elizabeth</h1>
               <p className="text-gray-600">
-                {textMessage.slice(0, 20) + "..."}
+                {textMessageTwo.slice(0, 20) + "..."}
               </p>
             </div>
             <div className="text-white">

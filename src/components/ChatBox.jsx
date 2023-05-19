@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { format } from "timeago.js";
 import InputEmoji from "react-input-emoji";
 import { IoCall, IoVideocam } from "react-icons/io5";
@@ -7,12 +7,62 @@ import { HiDotsVertical } from "react-icons/hi";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { AiOutlinePaperClip, AiOutlineClockCircle } from "react-icons/ai";
 import { BsEmojiSmile } from "react-icons/bs";
+import DefaultProfile from "../assets/profile.jpg";
+
+export const TestTexts = () => {
+  return (
+    <li className="bg-white pb-8">
+      <div className="flex justify-end items-end relative space-x-2">
+        <div className="space-y-2 flex flex-col justify-end items-end">
+          <div className="bg-activeBg py-2 px-4 text-gray-900 rounded-md flex flex-col items-end space-y-2">
+            <span>
+              {" "}
+              Next.js and Tailwind CSS starter In this project, I'm using
+              Next.js and Tailwind CSS, but at the end of the day all we're
+              doing is creating a React component. Feel free to use Next.js,
+              Gatsby, Create React App, or whatever library or starter you want.
+              The core concepts are the same as long as you're building with
+              React. Styling your component is also up to your project
+              preferences. I've been enjoying Tailwind CSS lately and use it in
+              this lesson, but feel free to use any CSS solution you want. Check
+              out the Tailwind installation guide if you're interested in using
+              Tailwind for your project.
+            </span>
+            <span className="text-gray-500 flex items-center space-x-2">
+              <div>
+                <AiOutlineClockCircle />
+              </div>
+              <p>01:55</p>
+            </span>
+            <span className="before:block before:absolute before:-inset-1  before:bg-activeBg relative w-2 h-2 rotate-45 -bottom-2 " />
+          </div>
+          <p>You</p>
+        </div>
+        <img
+          src={DefaultProfile}
+          alt="DefaultProfile"
+          className="h-12 w-12 rounded-full"
+        />
+      </div>
+    </li>
+  );
+};
 
 const ChatBox = () => {
   const inputFile = useRef(null);
   const uploadFile = () => {
     inputFile.current.click();
   };
+
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
 
   const ProfileMale =
     "https://themesbrand.com/chatvia/layouts/assets/images/users/avatar-7.jpg";
@@ -38,7 +88,7 @@ const ChatBox = () => {
         {/* users chat */}
         <div className="h-screen">
           {/* received message */}
-          <ul className="h-[100%] w-[100%]  p-5 py-28 pb-40 pr-5 overflow-hidden overflow-y-scroll scrollbar-hide ">
+          <ul className="h-[100%] w-[100%]  p-5 py-28 pb-40 pr-5 overflow-hidden overflow-y-scroll scrollbar-hide  absolute bottom-0">
             <li className="bg-white pb-8">
               <div className="flex justify-start items-end relative space-x-2">
                 <img
@@ -49,9 +99,11 @@ const ChatBox = () => {
                 <div className="space-y-2">
                   <div className="bg-primery py-2 px-4 text-white rounded-md flex flex-col items-end space-y-2">
                     <span>Hey, Good morning!</span>
-                    <span className="text-gray-300 flex items-center space-x-1">
-                      <AiOutlineClockCircle />
-                      <>01:55</>
+                    <span className="text-gray-500 flex items-center space-x-2">
+                      <div>
+                        <AiOutlineClockCircle />
+                      </div>
+                      <p>01:55</p>
                     </span>
                     <span className="before:block before:absolute before:-inset-1  before:bg-primery relative w-2 h-2 rotate-45 -bottom-2 right-[99%]" />
                   </div>
@@ -59,6 +111,32 @@ const ChatBox = () => {
                 </div>
               </div>
             </li>
+            {/* sent message */}
+            <li className="bg-white pb-8">
+              <div className="flex justify-end items-end relative space-x-2">
+                <div className="space-y-2 flex flex-col justify-end items-end">
+                  <div className="bg-activeBg py-2 px-4 text-gray-900 rounded-md flex flex-col items-end space-y-2">
+                    <span>Good morning!</span>
+                    <span className="text-gray-500 flex items-center space-x-2">
+                      <div>
+                        <AiOutlineClockCircle />
+                      </div>
+                      <p>01:55</p>
+                    </span>
+                    <span className="before:block before:absolute before:-inset-1  before:bg-activeBg relative w-2 h-2 rotate-45 -bottom-2 " />
+                  </div>
+                  <p>You</p>
+                </div>
+                <img
+                  src={DefaultProfile}
+                  alt="DefaultProfile"
+                  className="h-12 w-12 rounded-full"
+                />
+              </div>
+            </li>
+
+            {/* scroll to bottom reference */}
+            <div ref={messagesEndRef} />
           </ul>
         </div>
         {/* chat-sender */}
