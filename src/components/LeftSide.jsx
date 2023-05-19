@@ -8,22 +8,18 @@ import { FaRegUserCircle } from "react-icons/fa";
 
 const Header = () => {
   return (
-    <header className="bg-white w-20 h-screen p-5 flex flex-col justify-between items-center">
-      <div className="flex flex-col items-center space-y-14">
-        <img src={Logo} alt="Logo" className="w-10" />
-        <div className="flex justify-center items-center">
-          <Link to="/">
-            <BsChatRightDots className="h-16 w-16 rounded-lg text-primery bg-secondary cursor-pointer p-5" />
-          </Link>
-        </div>
-        <div className="flex justify-center items-center">
-          <Link to="/groups">
-            <RiGroupLine className="h-16 w-16 rounded-lg text-gray-800 cursor-pointer p-5" />
-          </Link>
-        </div>
-      </div>
-      <div className="flex flex-col justify-center items-center">
-        {/* <FaRegUserCircle className="h-16 w-16 rounded-lg text-gray-800 cursor-pointer p-5" /> */}
+    <header
+      className="bg-white lg:w-20 lg:h-screen w-full h-20 z-20 
+     absolute bottom-0 lg:left-0 right-0 p-5 flex lg:flex-col justify-between items-center overflow-hidden"
+    >
+      <div className="w-full h-[100%]  flex lg:flex-col justify-between items-center space-y-14 lg:mt-0 -mt-12">
+        <img src={Logo} alt="Logo" className="w-10 hidden lg:inline-flex" />
+        <Link to="/">
+          <BsChatRightDots className="h-12 w-12 rounded-lg text-primery bg-secondary cursor-pointer p-3" />
+        </Link>
+        <Link to="/groups">
+          <RiGroupLine className="h-12 w-12 rounded-lg text-gray-800 cursor-pointer p-3" />
+        </Link>
         <div>
           <img
             src={DefaultProfile}

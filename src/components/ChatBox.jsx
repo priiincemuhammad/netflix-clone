@@ -7,6 +7,7 @@ import { HiDotsVertical } from "react-icons/hi";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { AiOutlinePaperClip, AiOutlineClockCircle } from "react-icons/ai";
 import { BsEmojiSmile } from "react-icons/bs";
+import { IoChevronBack } from "react-icons/io5";
 import DefaultProfile from "../assets/profile.jpg";
 
 export const TestTexts = () => {
@@ -68,16 +69,21 @@ const ChatBox = () => {
     "https://themesbrand.com/chatvia/layouts/assets/images/users/avatar-7.jpg";
 
   return (
-    <div className="bg-white w-full relative">
+    <div className="bg-white w-full lg:relative absolute top-0  left-0 bottom-0 lg:right-0">
       {/* chat body  */}
       <div>
         {/* chat-header */}
         <div className="flex justify-between items-center z-10 p-5 border-b-2 border-gray-200 absolute top-0 left-0 right-0 bg-white">
-          <div>
-            <h2 className="font-bold text-gray-700 text-2xl">John smith</h2>
-            <p className="text-green-400 flex justify-start items-center">
-              Online <GoPrimitiveDot />
-            </p>
+          <div className="flex justify-start items-center space-x-7">
+            <div>
+              <IoChevronBack className="p-5 cursor-pointer h-16 w-16" />
+            </div>
+            <div>
+              <h2 className="font-bold text-gray-700 text-2xl">John smith</h2>
+              <p className="text-green-400 flex justify-start items-center">
+                Online <GoPrimitiveDot />
+              </p>
+            </div>
           </div>
           <div className="text-gray-800 text-2xl flex items-center space-x-7">
             <IoCall className="cursor-pointer" />
@@ -86,9 +92,9 @@ const ChatBox = () => {
           </div>
         </div>
         {/* users chat */}
-        <div className="h-screen">
+        <div className="h-full">
           {/* received message */}
-          <ul className="h-[100%] w-[100%]  p-5 py-28 pb-40 pr-5 overflow-hidden overflow-y-scroll scrollbar-hide  absolute bottom-0">
+          <ul className="h-[100%] w-[100%] p-5 py-28 pb-40 pr-5 overflow-hidden overflow-y-scroll scrollbar-hide  absolute bottom-0 left-0 right-0">
             <li className="bg-white pb-8">
               <div className="flex justify-start items-end relative space-x-2">
                 <img
@@ -99,7 +105,7 @@ const ChatBox = () => {
                 <div className="space-y-2">
                   <div className="bg-primery py-2 px-4 text-white rounded-md flex flex-col items-end space-y-2">
                     <span>Hey, Good morning!</span>
-                    <span className="text-gray-500 flex items-center space-x-2">
+                    <span className="text-gray-300 flex items-center space-x-2">
                       <div>
                         <AiOutlineClockCircle />
                       </div>
@@ -140,7 +146,7 @@ const ChatBox = () => {
           </ul>
         </div>
         {/* chat-sender */}
-        <div className="flex justify-between items-center space-x-7 p-5 border-t-2 border-gray-200 absolute bottom-0 left-0 right-0 bg-white">
+        <div className="flex justify-between items-center space-x-7 p-5 border-t-2 border-b-2 border-gray-200 absolute bottom-20 lg:bottom-0 left-0 right-0 bg-white z-30">
           <div className="w-full h-full relative">
             <input
               type="search"
