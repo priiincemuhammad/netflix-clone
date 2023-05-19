@@ -10,7 +10,7 @@ const Users = () => {
   const textMessageTwo = "Ok, then call me when you're free.";
 
   return (
-    <div className="bg-[#f5f7fb] lg:w-[350px] w-full col-span-3 p-5">
+    <div className="bg-[#f5f7fb] lg:w-[500px] w-full col-span-3 p-5">
       <div className="flex justify-between items-start">
         <h1 className="font-bold text-3xl text-gray-800">Chats</h1>
       </div>
@@ -66,7 +66,7 @@ const Users = () => {
                 {textMessageTwo.slice(0, 20) + "..."}
               </p>
             </div>
-            <div className="text-white">
+            <div className="text-gray-600">
               <p>11:07</p>
             </div>
           </div>
