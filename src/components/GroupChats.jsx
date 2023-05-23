@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { format } from "timeago.js";
 import InputEmoji from "react-input-emoji";
 import { IoCall, IoVideocam } from "react-icons/io5";
@@ -9,8 +9,65 @@ import { AiOutlinePaperClip, AiOutlineClockCircle } from "react-icons/ai";
 import { BsEmojiSmile } from "react-icons/bs";
 import { IoChevronBack } from "react-icons/io5";
 import DefaultProfile from "../assets/profile.jpg";
+import { useSelector } from "react-redux";
+import { AppContext } from "../context/appContext";
 
-const ChatBox = () => {
+const GroupChats = () => {
+  const [message, setMessage] = useState("");
+  const user = useSelector((state) => state.user);
+  const {
+    socket,
+    rooms,
+    setRooms,
+    currentRoom,
+    setCurrentRoom,
+    members,
+    setMembers,
+    messages,
+    setMessages,
+    privateMemberMsg,
+    setPrivateMemberMsg,
+    newMessages,
+    setNewMessages,
+  } = useContext(AppContext);
+
+  socket.off("new-user").on("new-user", (payload) => {
+    console.log(payload);
+  });
+
+  const getFormattedDate = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    let month = (1 + date.getMonth()).toString();
+
+    month = month.length > 1 ? month : "0" + month;
+    let day = date.getDate().toString();
+
+    day = day.length > 1 ? day : "0" + day;
+
+    return month + "/" + day + "/" + year;
+  };
+
+  const todayDate = getFormattedDate();
+
+  socket.off("room-messages").on("room-messages", (roomMessages) => {
+    setMessages(roomMessages);
+  });
+
+  // send message
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (!message) return;
+    const today = new Date();
+    const minutes =
+      today.getMinutes() < 10 ? "0" + today.getMinutes() : today.getMinutes();
+    const time = today.getHours() + ":" + minutes;
+    const roomId = currentRoom;
+    socket.emit("message-room", roomId, message, user, time, todayDate);
+    setMessage("");
+  };
+
+  //************************************************************** */
   const inputFile = useRef(null);
   const uploadFile = () => {
     inputFile.current.click();
@@ -23,11 +80,6 @@ const ChatBox = () => {
   useEffect(() => {
     scrollToBottom();
   }, []);
-
-  // send message
-  const sendMessage = (e) => {
-    e.preventDefault();
-  };
 
   const ProfileMale =
     "https://themesbrand.com/chatvia/layouts/assets/images/users/avatar-7.jpg";
@@ -43,7 +95,7 @@ const ChatBox = () => {
               <IoChevronBack className="p-5 cursor-pointer h-16 w-16" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-700 text-2xl">John smith</h2>
+              <h2 className="font-bold text-gray-700 text-2xl">Group name</h2>
               <p className="text-green-400 flex justify-start items-center">
                 Online <GoPrimitiveDot />
               </p>
@@ -119,6 +171,8 @@ const ChatBox = () => {
           <form onSubmit={sendMessage} className="w-full h-full relative">
             <input
               type="search"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
               placeholder="Type message..."
               className="bg-activeBg text-gray-600 w-full p-2 pl-5 rounded-md outline-none focus:ring-1 ring-primery"
             />
@@ -140,4 +194,4 @@ const ChatBox = () => {
   );
 };
 
-export default ChatBox;
+export default GroupChats;

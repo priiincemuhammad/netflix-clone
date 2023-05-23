@@ -1,15 +1,16 @@
 import React from "react";
 import LeftSide from "../components/LeftSide";
+import Groups from "../components/Groups";
+import GroupChats from "../components/GroupChats";
 
 const GroupsPage = () => {
   return (
     <>
       <LeftSide />
-      <div className=" absolute top-0 bottom-0 lg:left-20 right-0 bg-primery">
+      <div className=" absolute top-0 bottom-0 lg:left-20 left-0 right-0 bg-primery">
         <div className="h-full flex justify-start">
-          <div className="p-5">
-            <h1 className="text-4xl text-white">Available rooms</h1>
-          </div>
+          <Groups />
+          <GroupChats />
         </div>
       </div>
     </>
