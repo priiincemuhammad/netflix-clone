@@ -44,7 +44,7 @@ const Header = () => {
           />
         </Link>
         <div className="lg:h-full lg:flex lg:items-end">
-          <div>
+          <div className="flex justify-center items-center lg:flex-col">
             <BiLogOut
               onClick={handleLogout}
               className="h-12 w-12 rounded-lg text-gray-800 cursor-pointer p-3"

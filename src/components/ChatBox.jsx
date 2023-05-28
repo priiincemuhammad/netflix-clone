@@ -12,9 +12,11 @@ import { IoChevronBack } from "react-icons/io5";
 import DefaultProfile from "../assets/profile.jpg";
 import { useSelector } from "react-redux";
 import { AppContext } from "../context/appContext";
+import EmojiPicker from "emoji-picker-react";
 
 const ChatBox = () => {
   const [message, setMessage] = useState("");
+  const [showEmoji, setShowEmoji] = useState(true);
   const user = useSelector((state) => state.user);
   const {
     socket,
@@ -30,9 +32,9 @@ const ChatBox = () => {
     setPrivateMemberMsg,
     newMessages,
     setNewMessages,
+    privateChat,
+    setPrivateChat,
   } = useContext(AppContext);
-
-  console.log(privateMemberMsg.username === undefined ? "yes" : "no");
 
   socket.off("new-user").on("new-user", (payload) => {
     setMembers(payload);
@@ -70,7 +72,13 @@ const ChatBox = () => {
     setMessage("");
   };
 
+  const handleChange = async (typedMsg) => {
+    setMessage(typedMsg);
+    console.log(typedMsg);
+  };
+
   //********************************************************************* */
+  const emojiPick = useRef(false);
   const inputFile = useRef(null);
   const uploadFile = () => {
     inputFile.current.click();
@@ -84,11 +92,25 @@ const ChatBox = () => {
     scrollToBottom();
   }, [message]);
 
+  useEffect(() => {
+    // return document.addEventListener("click", handleClickOutside);
+    return document.addEventListener("click", handleClickOutside, true);
+  }, []);
+
+  const handleClickOutside = (event) => {
+    // if (!emojiPick.current.contains(event.target))
+    if (emojiPick.current && !emojiPick.current.contains(event.target)) {
+      setShowEmoji(true);
+    }
+  };
+
+  // console.log(privateMemberMsg?.username);
+
   return (
-    <div className="bg-white w-full lg:relative absolute top-0  left-0 bottom-0 lg:right-0">
+    <>
       {/* chat body  */}
-      {privateMemberMsg.username === undefined ? (
-        <div className="w-full h-full flex flex-col items-center justify-center space-y-3">
+      {privateMemberMsg?.username === undefined ? (
+        <div className="w-full h-full hidden lg:flex flex-col items-center justify-center space-y-3">
           <div className="bg-[#7a7f9a] rounded-full h-28 w-28 flex justify-center items-center text-white ">
             <FiMessageSquare className="w-12 h-12" />
           </div>
@@ -97,151 +119,179 @@ const ChatBox = () => {
           </p>
         </div>
       ) : (
-        <div>
-          {/* chat-header */}
-          <div className="flex justify-between items-center z-10 p-5 border-b-2 border-gray-200 absolute top-0 left-0 right-0 bg-white">
-            <div className="flex justify-start items-center space-x-7">
-              <div className="lg:hidden flex">
-                <IoChevronBack className="p-5 cursor-pointer h-16 w-16" />
+        <div
+          className={`bg-white w-full lg:relative lg:right-0   bottom-0  absolute top-0 overflow-hidden ${
+            privateChat === false ? "-left-full" : "left-0"
+          }`}
+        >
+          <div>
+            {/* chat-header */}
+            <div className="flex justify-between items-center z-10 lg:p-5 p-2 border-b-2 border-gray-200 absolute top-0 left-0 right-0 bg-white">
+              <div className="flex justify-start items-center lg:space-x-7 space-x-2">
+                <div
+                  className="lg:hidden flex"
+                  onClick={() => setPrivateChat(false)}
+                >
+                  <IoChevronBack className="p-1 cursor-pointer h-8 w-8" />
+                </div>
+                <div>
+                  <img
+                    src={privateMemberMsg?.photo}
+                    alt="photo"
+                    className="h-10 w-10 lg:h-14 lg:w-14 rounded-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h2 className="font-bold text-gray-700 lg:text-2xl text-md">
+                    {privateMemberMsg?.username}
+                  </h2>
+                  {user?.status === "online" ? (
+                    <p className="text-green-400 flex justify-start items-center">
+                      Online <GoPrimitiveDot />
+                    </p>
+                  ) : (
+                    <p className="text-gray-400 flex justify-start items-center">
+                      Offline <GoPrimitiveDot />
+                    </p>
+                  )}
+                </div>
               </div>
-              <div>
-                <img
-                  src={privateMemberMsg.photo}
-                  alt="photo"
-                  className="h-14 w-14 rounded-full object-cover"
-                />
-              </div>
-              <div>
-                <h2 className="font-bold text-gray-700 text-2xl">
-                  {privateMemberMsg.username}
-                </h2>
-                {user.status === "online" ? (
-                  <p className="text-green-400 flex justify-start items-center">
-                    Online <GoPrimitiveDot />
-                  </p>
-                ) : (
-                  <p className="text-gray-400 flex justify-start items-center">
-                    Offline <GoPrimitiveDot />
-                  </p>
-                )}
+              <div className="text-gray-800 text-2xl flex items-center lg:space-x-7 space-x-3">
+                <IoCall className="cursor-pointer" />
+                <IoVideocam className="cursor-pointer" />
+                <HiDotsVertical className="cursor-pointer" />
               </div>
             </div>
-            <div className="text-gray-800 text-2xl flex items-center space-x-7">
-              <IoCall className="cursor-pointer" />
-              <IoVideocam className="cursor-pointer" />
-              <HiDotsVertical className="cursor-pointer" />
-            </div>
-          </div>
-          {/* users chat */}
-          <div className="h-full">
-            {/* received message */}
-            <ul className="h-[100%] w-[100%] space-y-8 p-5 py-28 pb-40 pr-5 overflow-hidden overflow-y-scroll scrollbar-hide  absolute bottom-0 left-0 right-0">
-              {user &&
-                messages.map(({ _id: date, messagesByDate }, index) => (
-                  <div key={index} className="space-y-8">
-                    {messagesByDate?.map(
-                      ({ content, time, from: sender }, msgIndex) => (
-                        <div key={msgIndex}>
-                          <li className="bg-white">
-                            <div
-                              className={`flex ${
-                                sender._id == user?._id
-                                  ? "justify-start flex-row-reverse"
-                                  : "justify-start"
-                              } items-end relative space-x-2`}
-                            >
-                              <img
-                                src={sender.photo}
-                                alt="ProfileMale"
-                                className="h-12 w-12 rounded-full object-cover"
-                              />
-                              <div className={`space-y-2 `}>
-                                <div
-                                  className={`${
-                                    sender._id == user?._id
-                                      ? "bg-activeBg text-gray-900"
-                                      : "bg-primery text-white"
-                                  } py-2 px-4  rounded-md flex flex-col items-start space-y-2`}
-                                >
-                                  <span>{content}</span>
-                                  <span
+            {/* users chat */}
+            <div className="h-full">
+              {/* received message */}
+              <ul className="h-[100%] w-[100%] space-y-8 p-5 py-28 pb-40 pr-5 overflow-hidden overflow-y-scroll scrollbar-hide  absolute bottom-0 left-0 right-0">
+                {user &&
+                  messages?.map(({ _id: date, messagesByDate }, index) => (
+                    <div key={index} className="space-y-8">
+                      {messagesByDate?.map(
+                        ({ content, time, from: sender }, msgIndex) => (
+                          <div key={msgIndex}>
+                            <li className="bg-white">
+                              <div
+                                className={`flex ${
+                                  sender._id == user?._id
+                                    ? "justify-start flex-row-reverse"
+                                    : "justify-start"
+                                } items-end relative space-x-2`}
+                              >
+                                <img
+                                  src={sender.photo}
+                                  alt="ProfileMale"
+                                  className="h-12 w-12 rounded-full object-cover"
+                                />
+                                <div className={`space-y-2 `}>
+                                  <div
                                     className={`${
                                       sender._id == user?._id
-                                        ? "text-gray-500"
-                                        : "text-gray-300"
-                                    } flex items-center`}
+                                        ? "bg-activeBg text-gray-900"
+                                        : "bg-primery text-white"
+                                    } py-2 px-4  rounded-md flex flex-col items-start space-y-2`}
                                   >
-                                    <div>
-                                      <AiOutlineClockCircle />
-                                    </div>
-                                    <p>{time}</p>
-                                  </span>
-                                  <span
+                                    <span>{content}</span>
+                                    <span
+                                      className={`${
+                                        sender._id == user?._id
+                                          ? "text-gray-500"
+                                          : "text-gray-300"
+                                      } flex items-center`}
+                                    >
+                                      <div>
+                                        <AiOutlineClockCircle />
+                                      </div>
+                                      <p>{time}</p>
+                                    </span>
+                                    <span
+                                      className={`${
+                                        sender._id == user?._id
+                                          ? "before:bg-activeBg   left-[99%]"
+                                          : "before:bg-primery  "
+                                      } before:block before:absolute before:-inset-1 relative w-2 h-2 rotate-45 -bottom-2`}
+                                    />
+                                  </div>
+                                  <p
                                     className={`${
                                       sender._id == user?._id
-                                        ? "before:bg-activeBg   left-[99%]"
-                                        : "before:bg-primery  "
-                                    } before:block before:absolute before:-inset-1 relative w-2 h-2 rotate-45 -bottom-2`}
-                                  />
+                                        ? "text-right"
+                                        : ""
+                                    }`}
+                                  >
+                                    {sender._id == user?._id
+                                      ? "You"
+                                      : sender.username}
+                                  </p>
                                 </div>
-                                <p
-                                  className={`${
-                                    sender._id == user?._id ? "text-right" : ""
-                                  }`}
-                                >
-                                  {sender._id == user?._id
-                                    ? "You"
-                                    : sender.username}
-                                </p>
                               </div>
-                            </div>
-                          </li>
-                        </div>
-                      )
-                    )}
-                    <li className="w-full flex justify-center items-center relative">
-                      <span className="z-10 bg-activeBg py-1 px-3 rounded-md text-gray-800">
-                        {date}
-                      </span>
-                      <span className="absolute w-full h-[1px] bg-activeBg" />
-                    </li>
-                    {/* scroll to bottom reference */}
-                    <div ref={messagesEndRef} />
-                  </div>
-                ))}
-            </ul>
-          </div>
-          {/* chat-sender */}
-          <div className="flex justify-between items-center space-x-7 p-5 border-t-2 border-b-2 border-gray-200 absolute bottom-20 lg:bottom-0 left-0 right-0 bg-white z-30">
-            <form onSubmit={sendMessage} className="w-full h-full relative">
-              <input
-                type="search"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type message..."
-                className="bg-activeBg text-gray-600 w-full p-2 pl-5 rounded-md outline-none focus:ring-1 ring-primery"
-              />
-              <div className="absolute top-0 right-0 bottom-0 flex h-full justify-center items-center space-x-3 pr-2">
-                <BsEmojiSmile className="h-4 w-4 cursor-pointer" />
-                <AiOutlinePaperClip
-                  onClick={uploadFile}
-                  className="h-5 w-5 cursor-pointer"
-                />
+                            </li>
+                          </div>
+                        )
+                      )}
+                      <li className="w-full flex justify-center items-center relative">
+                        <span className="z-10 bg-activeBg py-1 px-3 rounded-md text-gray-800">
+                          {date}
+                        </span>
+                        <span className="absolute w-full h-[1px] bg-activeBg" />
+                      </li>
+                      {/* scroll to bottom reference */}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  ))}
+              </ul>
+            </div>
+            {/* chat-sender */}
+            <div className="flex justify-between items-center space-x-7 p-5 border-t-2 border-b-2 border-gray-200 absolute bottom-20 lg:bottom-0 left-0 right-0 bg-white z-30">
+              <form onSubmit={sendMessage} className="w-full h-full relative">
                 <input
-                  type="file"
-                  id="file"
-                  ref={inputFile}
-                  className="hidden"
+                  type="search"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Type message..."
+                  className="bg-activeBg text-gray-600 w-full p-2 pl-5 rounded-md outline-none focus:ring-1 ring-primery"
                 />
+                {/* <InputEmoji onChange={handleChange} className="bg-black" /> */}
+                <div className="absolute top-0 right-0 bottom-0 flex h-full justify-center items-center space-x-3 pr-2">
+                  <div
+                    ref={emojiPick}
+                    className={`absolute lg:bottom-10 bottom-16 lg:right-0 -right-[4.5rem] overflow-hidden ${
+                      showEmoji ? "hidden" : ""
+                    }`}
+                  >
+                    <EmojiPicker
+                      className="overflow-hidden"
+                      onEmojiClick={(e) => {
+                        setMessage(message + e.emoji);
+                      }}
+                    />
+                  </div>
+                  <BsEmojiSmile
+                    onClick={() => setShowEmoji(!showEmoji)}
+                    className="h-4 w-4 cursor-pointer"
+                  />
+                  <AiOutlinePaperClip
+                    onClick={uploadFile}
+                    className="h-5 w-5 cursor-pointer"
+                  />
+                  <input
+                    type="file"
+                    id="file"
+                    ref={inputFile}
+                    className="hidden"
+                  />
+                </div>
+              </form>
+              <div onClick={sendMessage} className=" cursor-pointer">
+                <RiSendPlaneFill className="h-10 w-12 p-2 rounded-md bg-primery text-white" />
               </div>
-            </form>
-            <div onClick={sendMessage} className=" cursor-pointer">
-              <RiSendPlaneFill className="h-10 w-12 p-2 rounded-md bg-primery text-white" />
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

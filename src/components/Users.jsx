@@ -20,7 +20,10 @@ const Users = () => {
     setPrivateMemberMsg,
     newMessages,
     setNewMessages,
+    setPrivateChat,
   } = useContext(AppContext);
+
+  const filteredUsers = members.filter((newUser) => newUser._id !== user._id);
 
   const joinRoom = (room, isPublic = true) => {
     if (!user) {
@@ -73,7 +76,6 @@ const Users = () => {
     joinRoom(roomId, false);
   };
 
-  const textMessage = "Hey, how are you doing today?";
   const textMessageTwo = "Ok, then call me when you're free.";
 
   return (
@@ -90,12 +92,17 @@ const Users = () => {
         />
       </div>
       {/* users conversations */}
-      <div className="h-[88%] overflow-hidden overflow-y-scroll">
-        {members.map((member) => (
+      <div className="h-[80%] overflow-hidden overflow-y-scroll">
+        {filteredUsers.map((member) => (
           <div
             key={member._id}
-            onClick={() => handlePrivateMessage(member)}
-            className="hover:bg-activeBg flex justify-start items-center rounded-md cursor-pointer p-3 space-x-3"
+            onClick={() => {
+              handlePrivateMessage(member);
+              setPrivateChat(true);
+            }}
+            className={`hover:bg-activeBg ${
+              privateMemberMsg?._id === member._id ? "bg-activeBg" : ""
+            } flex justify-start items-center rounded-md cursor-pointer p-3 space-x-3`}
           >
             <div className="relative">
               <img

@@ -29,6 +29,8 @@ const GroupChats = () => {
     setPrivateMemberMsg,
     newMessages,
     setNewMessages,
+    groupChat,
+    setGroupChat,
   } = useContext(AppContext);
 
   socket.off("new-user").on("new-user", (payload) => {
@@ -82,25 +84,35 @@ const GroupChats = () => {
   }, [messages]);
 
   return (
-    <div className="bg-white w-full lg:relative absolute top-0  left-0 bottom-0 lg:right-0">
+    <div
+      className={`bg-white w-full lg:relative lg:right-0   bottom-0  absolute top-0 ${
+        groupChat === false ? "-left-full lg:left-0" : "left-0"
+      }`}
+    >
       {/* chat body  */}
       <div>
         {/* chat-header */}
-        <div className="flex justify-between items-center z-10 p-5 border-b-2 border-gray-200 absolute top-0 left-0 right-0 bg-white">
-          <div className="flex justify-start items-center space-x-7">
-            <div className="lg:hidden flex">
-              <IoChevronBack className="p-5 cursor-pointer h-16 w-16" />
+        <div className="flex justify-between items-center z-10 lg:p-5 p-2 border-b-2 border-gray-200 absolute top-0 left-0 right-0 bg-white">
+          <div className="flex justify-start items-center lg:space-x-7 space-x-2">
+            <div className="lg:hidden flex" onClick={() => setGroupChat(false)}>
+              <IoChevronBack className="p-1 cursor-pointer h-8 w-8" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-700 text-2xl">
+              <h2 className="font-bold text-gray-700 lg:text-2xl text-md">
                 {currentRoom}
               </h2>
-              <p className="text-green-400 flex justify-start items-center">
-                Online <GoPrimitiveDot />
-              </p>
+              {user?.status === "online" ? (
+                <p className="text-green-400 flex justify-start items-center">
+                  Online <GoPrimitiveDot />
+                </p>
+              ) : (
+                <p className="text-gray-400 flex justify-start items-center">
+                  Offline <GoPrimitiveDot />
+                </p>
+              )}
             </div>
           </div>
-          <div className="text-gray-800 text-2xl flex items-center space-x-7">
+          <div className="text-gray-800 text-2xl flex items-center lg:space-x-7 space-x-3">
             <IoCall className="cursor-pointer" />
             <IoVideocam className="cursor-pointer" />
             <HiDotsVertical className="cursor-pointer" />

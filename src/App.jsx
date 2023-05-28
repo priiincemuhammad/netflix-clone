@@ -15,6 +15,8 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [privateMemberMsg, setPrivateMemberMsg] = useState({});
   const [newMessages, setNewMessages] = useState({});
+  const [privateChat, setPrivateChat] = useState(false);
+  const [groupChat, setGroupChat] = useState(false);
 
   return (
     <AppContext.Provider
@@ -32,6 +34,10 @@ function App() {
         setPrivateMemberMsg,
         newMessages,
         setNewMessages,
+        privateChat,
+        setPrivateChat,
+        groupChat,
+        setGroupChat,
       }}
     >
       <BrowserRouter>

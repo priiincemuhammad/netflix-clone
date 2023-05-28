@@ -20,6 +20,8 @@ const Groups = () => {
     setPrivateMemberMsg,
     newMessages,
     setNewMessages,
+    groupChat,
+    setGroupChat,
   } = useContext(AppContext);
 
   console.log(messages);
@@ -82,7 +84,10 @@ const Groups = () => {
         {rooms.map((singleRoom, index) => (
           <div
             key={index}
-            onClick={() => joinRoom(singleRoom)}
+            onClick={() => {
+              joinRoom(singleRoom);
+              setGroupChat(true);
+            }}
             className={`hover:bg-activeBg ${
               currentRoom === singleRoom ? "bg-activeBg" : ""
             } flex justify-start items-center rounded-md cursor-pointer p-3 space-x-3`}

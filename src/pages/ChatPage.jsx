@@ -7,7 +7,7 @@ const ChatHome = () => {
   return (
     <>
       <LeftSide />
-      <div className=" absolute top-0 bottom-0 lg:left-20 left-0 right-0 bg-primery">
+      <div className=" absolute top-0 bottom-0 lg:left-20 left-0 right-0 bg-white">
         <div className="h-full flex justify-start">
           <Users />
           <ChatBox />
