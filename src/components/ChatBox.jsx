@@ -1,16 +1,76 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { format } from "timeago.js";
 import InputEmoji from "react-input-emoji";
 import { IoCall, IoVideocam } from "react-icons/io5";
 import { GoPrimitiveDot } from "react-icons/go";
 import { HiDotsVertical } from "react-icons/hi";
+import { FiMessageSquare } from "react-icons/fi";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { AiOutlinePaperClip, AiOutlineClockCircle } from "react-icons/ai";
 import { BsEmojiSmile } from "react-icons/bs";
 import { IoChevronBack } from "react-icons/io5";
 import DefaultProfile from "../assets/profile.jpg";
+import { useSelector } from "react-redux";
+import { AppContext } from "../context/appContext";
 
 const ChatBox = () => {
+  const [message, setMessage] = useState("");
+  const user = useSelector((state) => state.user);
+  const {
+    socket,
+    rooms,
+    setRooms,
+    currentRoom,
+    setCurrentRoom,
+    members,
+    setMembers,
+    messages,
+    setMessages,
+    privateMemberMsg,
+    setPrivateMemberMsg,
+    newMessages,
+    setNewMessages,
+  } = useContext(AppContext);
+
+  console.log(privateMemberMsg.username === undefined ? "yes" : "no");
+
+  socket.off("new-user").on("new-user", (payload) => {
+    setMembers(payload);
+  });
+
+  const getFormattedDate = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    let month = (1 + date.getMonth()).toString();
+
+    month = month.length > 1 ? month : "0" + month;
+    let day = date.getDate().toString();
+
+    day = day.length > 1 ? day : "0" + day;
+
+    return month + "/" + day + "/" + year;
+  };
+
+  const todayDate = getFormattedDate();
+
+  socket.off("room-messages").on("room-messages", (roomMessages) => {
+    setMessages(roomMessages);
+  });
+
+  // send message
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (!message) return;
+    const today = new Date();
+    const minutes =
+      today.getMinutes() < 10 ? "0" + today.getMinutes() : today.getMinutes();
+    const time = today.getHours() + ":" + minutes;
+    const roomId = currentRoom;
+    socket.emit("message-room", roomId, message, user, time, todayDate);
+    setMessage("");
+  };
+
+  //********************************************************************* */
   const inputFile = useRef(null);
   const uploadFile = () => {
     inputFile.current.click();
@@ -22,120 +82,165 @@ const ChatBox = () => {
   };
   useEffect(() => {
     scrollToBottom();
-  }, []);
-
-  // send message
-  const sendMessage = (e) => {
-    e.preventDefault();
-  };
-
-  const ProfileMale =
-    "https://themesbrand.com/chatvia/layouts/assets/images/users/avatar-7.jpg";
+  }, [message]);
 
   return (
     <div className="bg-white w-full lg:relative absolute top-0  left-0 bottom-0 lg:right-0">
       {/* chat body  */}
-      <div>
-        {/* chat-header */}
-        <div className="flex justify-between items-center z-10 p-5 border-b-2 border-gray-200 absolute top-0 left-0 right-0 bg-white">
-          <div className="flex justify-start items-center space-x-7">
-            <div className="lg:hidden flex">
-              <IoChevronBack className="p-5 cursor-pointer h-16 w-16" />
-            </div>
-            <div>
-              <h2 className="font-bold text-gray-700 text-2xl">John smith</h2>
-              <p className="text-green-400 flex justify-start items-center">
-                Online <GoPrimitiveDot />
-              </p>
-            </div>
+      {privateMemberMsg.username === undefined ? (
+        <div className="w-full h-full flex flex-col items-center justify-center space-y-3">
+          <div className="bg-[#7a7f9a] rounded-full h-28 w-28 flex justify-center items-center text-white ">
+            <FiMessageSquare className="w-12 h-12" />
           </div>
-          <div className="text-gray-800 text-2xl flex items-center space-x-7">
-            <IoCall className="cursor-pointer" />
-            <IoVideocam className="cursor-pointer" />
-            <HiDotsVertical className="cursor-pointer" />
-          </div>
+          <p className="bg-[#7a7f9a] rounded-full py-1 px-5 text-2xl text-white font-semibold">
+            Start Conversation
+          </p>
         </div>
-        {/* users chat */}
-        <div className="h-full">
-          {/* received message */}
-          <ul className="h-[100%] w-[100%] space-y-8 p-5 py-28 pb-40 pr-5 overflow-hidden overflow-y-scroll scrollbar-hide  absolute bottom-0 left-0 right-0">
-            <li className="bg-white">
-              <div className="flex justify-start items-end relative space-x-2">
-                <img
-                  src={ProfileMale}
-                  alt="ProfileMale"
-                  className="h-12 w-12 rounded-full"
-                />
-                <div className="space-y-2">
-                  <div className="bg-primery py-2 px-4 text-white rounded-md flex flex-col items-end space-y-2">
-                    <span>Hey, Good morning!</span>
-                    <span className="text-gray-300 flex items-center space-x-2">
-                      <div>
-                        <AiOutlineClockCircle />
-                      </div>
-                      <p>01:55</p>
-                    </span>
-                    <span className="before:block before:absolute before:-inset-1  before:bg-primery relative w-2 h-2 rotate-45 -bottom-2 right-[99%]" />
-                  </div>
-                  <p>Jhon smith</p>
-                </div>
+      ) : (
+        <div>
+          {/* chat-header */}
+          <div className="flex justify-between items-center z-10 p-5 border-b-2 border-gray-200 absolute top-0 left-0 right-0 bg-white">
+            <div className="flex justify-start items-center space-x-7">
+              <div className="lg:hidden flex">
+                <IoChevronBack className="p-5 cursor-pointer h-16 w-16" />
               </div>
-            </li>
-            {/* sent message */}
-            <li className="bg-white">
-              <div className="flex justify-end items-end relative space-x-2">
-                <div className="space-y-2 flex flex-col justify-end items-end">
-                  <div className="bg-activeBg py-2 px-4 text-gray-900 rounded-md flex flex-col items-end space-y-2">
-                    <span>Good morning!</span>
-                    <span className="text-gray-500 flex items-center space-x-2">
-                      <div>
-                        <AiOutlineClockCircle />
-                      </div>
-                      <p>01:55</p>
-                    </span>
-                    <span className="before:block before:absolute before:-inset-1  before:bg-activeBg relative w-2 h-2 rotate-45 -bottom-2 " />
-                  </div>
-                  <p>You</p>
-                </div>
+              <div>
                 <img
-                  src={DefaultProfile}
-                  alt="DefaultProfile"
-                  className="h-12 w-12 rounded-full"
+                  src={privateMemberMsg.photo}
+                  alt="photo"
+                  className="h-14 w-14 rounded-full object-cover"
                 />
               </div>
-            </li>
-            <li className="w-full flex justify-center items-center relative">
-              <span className="z-10 bg-activeBg py-1 px-3 rounded-md text-gray-800">
-                Today
-              </span>
-              <span className="absolute w-full h-[1px] bg-activeBg" />
-            </li>
-            {/* scroll to bottom reference */}
-            <div ref={messagesEndRef} />
-          </ul>
-        </div>
-        {/* chat-sender */}
-        <div className="flex justify-between items-center space-x-7 p-5 border-t-2 border-b-2 border-gray-200 absolute bottom-20 lg:bottom-0 left-0 right-0 bg-white z-30">
-          <form onSubmit={sendMessage} className="w-full h-full relative">
-            <input
-              type="search"
-              placeholder="Type message..."
-              className="bg-activeBg text-gray-600 w-full p-2 pl-5 rounded-md outline-none focus:ring-1 ring-primery"
-            />
-            <div className="absolute top-0 right-0 bottom-0 flex h-full justify-center items-center space-x-3 pr-2">
-              <BsEmojiSmile className="h-4 w-4 cursor-pointer" />
-              <AiOutlinePaperClip
-                onClick={uploadFile}
-                className="h-5 w-5 cursor-pointer"
+              <div>
+                <h2 className="font-bold text-gray-700 text-2xl">
+                  {privateMemberMsg.username}
+                </h2>
+                {user.status === "online" ? (
+                  <p className="text-green-400 flex justify-start items-center">
+                    Online <GoPrimitiveDot />
+                  </p>
+                ) : (
+                  <p className="text-gray-400 flex justify-start items-center">
+                    Offline <GoPrimitiveDot />
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="text-gray-800 text-2xl flex items-center space-x-7">
+              <IoCall className="cursor-pointer" />
+              <IoVideocam className="cursor-pointer" />
+              <HiDotsVertical className="cursor-pointer" />
+            </div>
+          </div>
+          {/* users chat */}
+          <div className="h-full">
+            {/* received message */}
+            <ul className="h-[100%] w-[100%] space-y-8 p-5 py-28 pb-40 pr-5 overflow-hidden overflow-y-scroll scrollbar-hide  absolute bottom-0 left-0 right-0">
+              {user &&
+                messages.map(({ _id: date, messagesByDate }, index) => (
+                  <div key={index} className="space-y-8">
+                    {messagesByDate?.map(
+                      ({ content, time, from: sender }, msgIndex) => (
+                        <div key={msgIndex}>
+                          <li className="bg-white">
+                            <div
+                              className={`flex ${
+                                sender._id == user?._id
+                                  ? "justify-start flex-row-reverse"
+                                  : "justify-start"
+                              } items-end relative space-x-2`}
+                            >
+                              <img
+                                src={sender.photo}
+                                alt="ProfileMale"
+                                className="h-12 w-12 rounded-full object-cover"
+                              />
+                              <div className={`space-y-2 `}>
+                                <div
+                                  className={`${
+                                    sender._id == user?._id
+                                      ? "bg-activeBg text-gray-900"
+                                      : "bg-primery text-white"
+                                  } py-2 px-4  rounded-md flex flex-col items-start space-y-2`}
+                                >
+                                  <span>{content}</span>
+                                  <span
+                                    className={`${
+                                      sender._id == user?._id
+                                        ? "text-gray-500"
+                                        : "text-gray-300"
+                                    } flex items-center`}
+                                  >
+                                    <div>
+                                      <AiOutlineClockCircle />
+                                    </div>
+                                    <p>{time}</p>
+                                  </span>
+                                  <span
+                                    className={`${
+                                      sender._id == user?._id
+                                        ? "before:bg-activeBg   left-[99%]"
+                                        : "before:bg-primery  "
+                                    } before:block before:absolute before:-inset-1 relative w-2 h-2 rotate-45 -bottom-2`}
+                                  />
+                                </div>
+                                <p
+                                  className={`${
+                                    sender._id == user?._id ? "text-right" : ""
+                                  }`}
+                                >
+                                  {sender._id == user?._id
+                                    ? "You"
+                                    : sender.username}
+                                </p>
+                              </div>
+                            </div>
+                          </li>
+                        </div>
+                      )
+                    )}
+                    <li className="w-full flex justify-center items-center relative">
+                      <span className="z-10 bg-activeBg py-1 px-3 rounded-md text-gray-800">
+                        {date}
+                      </span>
+                      <span className="absolute w-full h-[1px] bg-activeBg" />
+                    </li>
+                    {/* scroll to bottom reference */}
+                    <div ref={messagesEndRef} />
+                  </div>
+                ))}
+            </ul>
+          </div>
+          {/* chat-sender */}
+          <div className="flex justify-between items-center space-x-7 p-5 border-t-2 border-b-2 border-gray-200 absolute bottom-20 lg:bottom-0 left-0 right-0 bg-white z-30">
+            <form onSubmit={sendMessage} className="w-full h-full relative">
+              <input
+                type="search"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Type message..."
+                className="bg-activeBg text-gray-600 w-full p-2 pl-5 rounded-md outline-none focus:ring-1 ring-primery"
               />
-              <input type="file" id="file" ref={inputFile} className="hidden" />
+              <div className="absolute top-0 right-0 bottom-0 flex h-full justify-center items-center space-x-3 pr-2">
+                <BsEmojiSmile className="h-4 w-4 cursor-pointer" />
+                <AiOutlinePaperClip
+                  onClick={uploadFile}
+                  className="h-5 w-5 cursor-pointer"
+                />
+                <input
+                  type="file"
+                  id="file"
+                  ref={inputFile}
+                  className="hidden"
+                />
+              </div>
+            </form>
+            <div onClick={sendMessage} className=" cursor-pointer">
+              <RiSendPlaneFill className="h-10 w-12 p-2 rounded-md bg-primery text-white" />
             </div>
-          </form>
-          <div onClick={sendMessage} className=" cursor-pointer">
-            <RiSendPlaneFill className="h-10 w-12 p-2 rounded-md bg-primery text-white" />
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -36,8 +36,12 @@ function App() {
     >
       <BrowserRouter>
         <Routes>
-          <Route exact path="/" element={<ChatPage />} />
-          <Route exact path="/groups" element={<GroupsPage />} />
+          <Route exact path="/" element={user ? <ChatPage /> : <Signup />} />
+          <Route
+            exact
+            path="/groups"
+            element={user ? <GroupsPage /> : <Signup />}
+          />
           <Route exact path="/signup" element={<Signup />} />
           <Route exact path="/signin" element={<Signin />} />
         </Routes>
